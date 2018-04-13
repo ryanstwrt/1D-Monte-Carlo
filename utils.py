@@ -58,10 +58,10 @@ def rand_col(sigma_s, sigma_t):
 
 # Grabs the cell number for the particle based on the defined mesh
 # To Do: Needs to be changed to cells not the mesh!!!!
-def get_cell(pos, mesh):
-    for i, x in enumerate(mesh):
+def get_cell(pos, cells, mat_pos):
+    for i, x in enumerate(cells):
         if i > 0:
-            if mesh[i-1] < pos < mesh[i]:
-                return i-1
+            if mat_pos[i-1] < pos < mat_pos[i]:
+                return int(cells[i])
             else:
                 pass

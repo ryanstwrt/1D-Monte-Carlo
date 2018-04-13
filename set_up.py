@@ -12,8 +12,8 @@ class particle:
             self.pos = ut.rand_init_pos(mesh[0], mesh[-1])
         else:
             self.pos = ut.rand_pos(mesh, flux)
-    def set_cell(self, pos, mesh):
-        self.cell = ut.get_cell(pos, mesh)
+    def set_cell(self, pos, cells, mat_pos):
+        self.cell = ut.get_cell(pos, cells, mat_pos)
     def set_enrg(self):
         self.enrg = 1
     def set_dir(self):
@@ -21,11 +21,11 @@ class particle:
 
 
 # Creates a particle with a a set of unique characteristics
-def gen_particle(keff, history, mesh, flux):
+def gen_particle(keff, history, mesh, flux, geo):
     p = particle()
     p.set_wt(keff)
-    p.set_pos(history, mesh, flux)
-    p.set_cell(p.pos, mesh)
+    p.set_pos(history, geo.pos, flux)
+    p.set_cell(p.pos, geo.cells, geo.pos)
     p.set_enrg()
     p.set_dir()
     return p
@@ -56,8 +56,8 @@ def get_data(test_case):
                         mat_array[i-1][x] = mat_line[x]
         return mat_array
 
-
-
+# Reads in the input file and creates three separate vectors
+# One vector for the geometry, one for the mesh and one for the kcode info
 def input_reader(input_dir):
     with open(input_dir, "r") as file:
         # Figure out the number of cells in the problem
@@ -93,6 +93,9 @@ def input_reader(input_dir):
 
         return cell_array, mesh, k_code
 
+
+# Creates a class for the geometry to easy obtain all relevent information
+# regarding cells, mesh XC, etc.
 class geometry:
     def set_mesh(self, mesh):
         self.mesh = mesh
@@ -103,6 +106,8 @@ class geometry:
     def set_mat(self, cell_array):
         self.mat = cell_array[:, 2]
 
+
+# Sets up the geometry from the information from the input file
 def gen_geometry(mesh, cell_array):
     geo = geometry()
     geo.set_mesh(mesh)
@@ -119,5 +124,6 @@ cell_array, mesh, k_code = input_reader(input_dir)
 flux = np.ones_like(mesh)
 
 geo = gen_geometry(mesh, cell_array)
-p = gen_particle(1.0, 0, mesh, flux)
-
+p = gen_particle(1.0, 0, mesh, flux, geo)
+#print(geo.cells, geo.pos)
+print(p.pos, p.cell)
