@@ -1,36 +1,6 @@
 import numpy as np
 from random import *
 
-test_case = "TestA.txt"
-
-
-# Read in the data from the different test cases
-def get_data(test_case):
-    with open(test_case, "r") as file:
-        # determine the number of rows needed
-        num_row = int(sum(1 for x in file)-1)
-        file.seek(0)
-        # determine the number of columns needed
-        for line in file:
-            num_col = int(sum(1 for x in line.split(' ')))
-        # Return to the top of the file and step through each line
-        # Then pull the data in each line and place it in a matrix
-        # Which will have the form
-        file.seek(0)
-        mat_array = np.zeros((num_row, num_col))
-        for i, line in enumerate(file):
-            if i == 0:
-                pass
-            else:
-                mat_line = [x for x in line.split(' ')]
-                for x in range(len(mat_line)):
-                    if x == 0:
-                        pass
-                    else:
-                        mat_array[i-1][x] = mat_line[x]
-        return mat_array
-
-
 # Get an initial random position based some upper and lower bound
 def rand_init_pos(lower, upper):
     if lower > upper:
@@ -87,6 +57,7 @@ def rand_col(sigma_s, sigma_t):
 
 
 # Grabs the cell number for the particle based on the defined mesh
+# To Do: Needs to be changed to cells not the mesh!!!!
 def get_cell(pos, mesh):
     for i, x in enumerate(mesh):
         if i > 0:
