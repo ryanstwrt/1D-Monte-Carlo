@@ -18,6 +18,21 @@ class particle:
         self.enrg = 1
     def set_dir(self):
         self.dir = ut.rand_dir()
+    def set_alive(self):
+        self.alive = 1
+
+
+# Creates a class for the geometry to easy obtain all relevent information
+# regarding cells, mesh XC, etc.
+class geometry:
+    def set_mesh(self, mesh):
+        self.mesh = mesh
+    def set_cells(self, cell_array):
+        self.cells = cell_array[:, 0]
+    def set_pos(self, cell_array):
+        self.pos = cell_array[:, 1]
+    def set_mat(self, cell_array):
+        self.mat = cell_array[:, 2]
 
 
 # Creates a particle with a a set of unique characteristics
@@ -28,6 +43,7 @@ def gen_particle(keff, history, mesh, flux, geo):
     p.set_cell(p.pos, geo.cells, geo.pos)
     p.set_enrg()
     p.set_dir()
+    p.set_alive()
     return p
 
 # Read in the data from the different test cases
@@ -55,6 +71,7 @@ def get_data(test_case):
                     else:
                         mat_array[i-1][x] = mat_line[x]
         return mat_array
+
 
 # Reads in the input file and creates three separate vectors
 # One vector for the geometry, one for the mesh and one for the kcode info
@@ -94,19 +111,6 @@ def input_reader(input_dir):
         return cell_array, mesh, k_code
 
 
-# Creates a class for the geometry to easy obtain all relevent information
-# regarding cells, mesh XC, etc.
-class geometry:
-    def set_mesh(self, mesh):
-        self.mesh = mesh
-    def set_cells(self, cell_array):
-        self.cells = cell_array[:, 0]
-    def set_pos(self, cell_array):
-        self.pos = cell_array[:, 1]
-    def set_mat(self, cell_array):
-        self.mat = cell_array[:, 2]
-
-
 # Sets up the geometry from the information from the input file
 def gen_geometry(mesh, cell_array):
     geo = geometry()
@@ -115,6 +119,7 @@ def gen_geometry(mesh, cell_array):
     geo.set_cells(cell_array)
     geo.set_pos(cell_array)
     return geo
+
 
 test_case = "TestA.txt"
 input_dir = "Input_File.txt"
@@ -127,3 +132,4 @@ geo = gen_geometry(mesh, cell_array)
 p = gen_particle(1.0, 0, mesh, flux, geo)
 #print(geo.cells, geo.pos)
 print(p.pos, p.cell)
+print(k_code)
