@@ -30,19 +30,6 @@ def gen_particle(keff, history, mesh, flux):
     p.set_dir()
     return p
 
-
-#class geometry(mesh, mat_array):
- #   def mesh(self):
- #       self.mesh = mesh
- #   def material(self):
- #       self.mat = get_geometry()
- #   def sigma_t(self, mat_array):
- #       self.sigma_t_1 = mat_array
-
-
-test_case = "TestA.txt"
-
-
 # Read in the data from the different test cases
 def get_data(test_case):
     with open(test_case, "r") as file:
@@ -69,11 +56,10 @@ def get_data(test_case):
                         mat_array[i-1][x] = mat_line[x]
         return mat_array
 
-geom_dir = "Input_File.txt"
 
 
-def get_geometry(geom_dir):
-    with open(geom_dir, "r") as file:
+def input_reader(input_dir):
+    with open(input_dir, "r") as file:
         # Figure out the number of cells in the problem
         num_cells = 0
         for i, line in enumerate(file):
@@ -87,19 +73,51 @@ def get_geometry(geom_dir):
         for i, line in enumerate(file):
             if line == "\n":
                 break
+
             geo_line = [x for x in line.split(' ')]
             if i == 0:
                 cell_array[i][1] = float(geo_line[1])
             else:
                 cell_array[i][1] = cell_array[i-1][1] + float(geo_line[1])
-            cell_array[i][0] = geo_line[0]
-            cell_array[i][2] = geo_line[2]
+            cell_array[i][0] = int(geo_line[0])
+            cell_array[i][2] = int(geo_line[2])
 
+        k_code = np.zeros(4)
+        for i, line in enumerate(file):
+            mat_line = [x for x in line.split(' ')]
+            if i == 0:
+                mesh_len = int(mat_line[1])
+                mesh = np.arange(0, mesh_len)
+            else:
+                k_code[i-1] = float(mat_line[1])
 
-    return
+        return cell_array, mesh, k_code
 
-get_geometry(geom_dir)
+class geometry:
+    def set_mesh(self, mesh):
+        self.mesh = mesh
+    def set_cells(self, cell_array):
+        self.cells = cell_array[:, 0]
+    def set_pos(self, cell_array):
+        self.pos = cell_array[:, 1]
+    def set_mat(self, cell_array):
+        self.mat = cell_array[:, 2]
 
-mesh = flux = np.arange(0, 4)
+def gen_geometry(mesh, cell_array):
+    geo = geometry()
+    geo.set_mesh(mesh)
+    geo.set_mat(cell_array)
+    geo.set_cells(cell_array)
+    geo.set_pos(cell_array)
+    return geo
 
+test_case = "TestA.txt"
+input_dir = "Input_File.txt"
+
+cell_array, mesh, k_code = input_reader(input_dir)
+
+flux = np.ones_like(mesh)
+
+geo = gen_geometry(mesh, cell_array)
 p = gen_particle(1.0, 0, mesh, flux)
+
