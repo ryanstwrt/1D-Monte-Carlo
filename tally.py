@@ -46,11 +46,11 @@ def init_mesh_tally(geo):
     mt.init_mesh(len(geo.mesh))
     return mt
 
-mesh_tal = init_mesh_tally(su.geo)
-k = init_k_tally(su.k_code)
+#mesh_tal = init_mesh_tally(su.geo)
+#k = init_k_tally(su.k_code)
 
-for x in range(len(mesh_tal.mesh)):
-    cell = 41
-    tr_len = x + 1
-    mesh_tal.accumulate(mesh_tal.mesh, cell, tr_len)
-print(mesh_tal.mesh)
+#for x in range(len(mesh_tal.mesh)):
+#    cell = 41
+#    tr_len = x + 1
+#    mesh_tal.accumulate(mesh_tal.mesh, cell, tr_len)
+#print(mesh_tal.mesh)

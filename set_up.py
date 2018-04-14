@@ -121,15 +121,15 @@ def gen_geometry(mesh, cell_array):
     return geo
 
 
-test_case = "TestA.txt"
-input_dir = "Input_File.txt"
+#test_case = "TestA.txt"
+#input_dir = "Input_File.txt"
 
-cell_array, mesh, k_code = input_reader(input_dir)
+#cell_array, mesh, k_code = input_reader(input_dir)
 
-flux = np.ones_like(mesh)
+#flux = np.ones_like(mesh)
 
-geo = gen_geometry(mesh, cell_array)
-p = gen_particle(1.0, 0, mesh, flux, geo)
+#geo = gen_geometry(mesh, cell_array)
+#p = gen_particle(1.0, 0, mesh, flux, geo)
 #print(geo.cells, geo.pos)
-print(p.pos, p.cell)
-print(k_code)
+#print(p.pos, p.cell)
+#print(k_code)
