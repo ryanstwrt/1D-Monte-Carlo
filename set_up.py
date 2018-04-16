@@ -35,6 +35,7 @@ class geometry:
         self.mat = cell_array[:, 2]
 
 
+
 # Creates a particle with a a set of unique characteristics
 def gen_particle(keff, history, mesh, flux, geo):
     p = particle()

@@ -33,15 +33,6 @@ def rand_dir():
     return direction
 
 
-# Get a random path length traveled based on Transport XC
-def rand_dist(mu, sigma_t):
-    if -1 >= mu <= 1:
-        print('FATAL ERROR: Scattering angle %f was not within bounds of -1 to 1' % mu)
-        quit()
-    dist = - mu * np.log(random()) / sigma_t
-    return dist
-
-
 # Return a 0 on scatter and a 1 on absorption
 def rand_col(sigma_s, sigma_t):
     if sigma_s > sigma_t:
@@ -61,6 +52,6 @@ def get_cell(pos, cells, mat_pos):
     for i, x in enumerate(cells):
         if i > 0:
             if mat_pos[i-1] < pos < mat_pos[i]:
-                return int(cells[i])
+                return int(cells[i]+1)
             else:
                 pass
