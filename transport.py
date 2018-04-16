@@ -58,14 +58,31 @@ def get_delta_x(mu, col_dist):
 # Determine if a the particle has crossed a surface
 def det_surf_cross(delta_x, p, geo):
     if delta_x > 0:
+        new_pos = p.pos + delta_x
         dist2surf = geo.pos[p.cell] - p.pos
     else:
+        new_pos = p.pos - delta_x
         dist2surf = p.pos - geo.pos[p.cell-1]
-    if delta_x >= dist2surf:
-        return 1
+    print(delta_x, new_pos, dist2surf)
+    if abs(delta_x) >= abs(dist2surf):
+        return dist2surf, True
     else:
-        return 0
+        return new_pos, False
 
 
-def move_part():
+# If the particle has not moved outside the cell, simply move the particle
+# to the new position and do not update the cell
+def move_part(p, delta_x):
+    p.pos += delta_x
     return
+
+
+# If the particle has moved to a surface, move the particle to the surface and
+# update the cell the particle is currently in
+def move_part2surf(p, delta_x):
+    p.pos += delta_x
+    if delta_x < 0:
+        p.cell += 1
+    else:
+        p.cell -= 1
+    return p.cell

@@ -47,6 +47,17 @@ def gen_particle(keff, history, mesh, flux, geo):
     p.set_alive()
     return p
 
+
+# Sets up the geometry from the information from the input file
+def gen_geometry(mesh, cell_array):
+    geo = geometry()
+    geo.set_mesh(mesh)
+    geo.set_mat(cell_array)
+    geo.set_cells(cell_array)
+    geo.set_pos(cell_array)
+    return geo
+
+
 # Read in the data from the different test cases
 def get_data(test_case):
     with open(test_case, "r") as file:
@@ -107,14 +118,3 @@ def input_reader(input_dir):
                 k_code[i-1] = float(mat_line[1])
 
         return cell_array, mesh, k_code
-
-
-# Sets up the geometry from the information from the input file
-def gen_geometry(mesh, cell_array):
-    geo = geometry()
-    geo.set_mesh(mesh)
-    geo.set_mat(cell_array)
-    geo.set_cells(cell_array)
-    geo.set_pos(cell_array)
-    return geo
-
