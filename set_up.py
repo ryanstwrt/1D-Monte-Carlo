@@ -85,21 +85,18 @@ def input_reader(input_dir):
                 break
             num_cells += 1
 
-        # Write
-        cell_array = np.zeros((num_cells, 3))
+        # Write the cell array (forcing the cell array to start at 0.0
+        cell_array = np.zeros((num_cells+1, 3))
         file.seek(0)
         for i, line in enumerate(file):
             if line == "\n":
                 break
-
             geo_line = [x for x in line.split(' ')]
-            if i == 0:
-                cell_array[i][1] = float(geo_line[1])
-            else:
-                cell_array[i][1] = cell_array[i-1][1] + float(geo_line[1])
-            cell_array[i][0] = int(geo_line[0])
-            cell_array[i][2] = int(geo_line[2])
+            cell_array[i+1][0] = int(geo_line[0])
+            cell_array[i+1][1] = cell_array[i-1][1] + float(geo_line[1])
+            cell_array[i+1][2] = int(geo_line[2])
 
+        # Write down the kcode information
         k_code = np.zeros(4)
         for i, line in enumerate(file):
             mat_line = [x for x in line.split(' ')]
@@ -121,16 +118,3 @@ def gen_geometry(mesh, cell_array):
     geo.set_pos(cell_array)
     return geo
 
-
-#test_case = "TestA.txt"
-#input_dir = "Input_File.txt"
-
-#cell_array, mesh, k_code = input_reader(input_dir)
-
-#flux = np.ones_like(mesh)
-
-#geo = gen_geometry(mesh, cell_array)
-#p = gen_particle(1.0, 0, mesh, flux, geo)
-#print(geo.cells, geo.pos)
-#print(p.pos, p.cell)
-#print(k_code)

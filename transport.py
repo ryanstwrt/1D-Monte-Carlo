@@ -1,5 +1,6 @@
 import utils as ut
 import numpy as np
+import set_up as su
 from random import *
 
 class XC():
@@ -54,4 +55,17 @@ def get_delta_x(mu, col_dist):
     delta_x = - mu * col_dist
     return delta_x
 
-#def det_surf_cross(delta_x, p, geo):
+# Determine if a the particle has crossed a surface
+def det_surf_cross(delta_x, p, geo):
+    if delta_x > 0:
+        dist2surf = geo.pos[p.cell] - p.pos
+    else:
+        dist2surf = p.pos - geo.pos[p.cell-1]
+    if delta_x >= dist2surf:
+        return 1
+    else:
+        return 0
+
+
+def move_part():
+    return

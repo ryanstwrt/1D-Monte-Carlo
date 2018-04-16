@@ -52,6 +52,6 @@ def get_cell(pos, cells, mat_pos):
     for i, x in enumerate(cells):
         if i > 0:
             if mat_pos[i-1] < pos < mat_pos[i]:
-                return int(cells[i]+1)
+                return int(cells[i]-1)
             else:
                 pass

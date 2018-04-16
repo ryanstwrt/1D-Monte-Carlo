@@ -20,10 +20,10 @@ for i in range(0, int(kcode[1])):
         # Generates a new particle each time
         p = su.gen_particle(kcode[3], i, mesh, cell_array, geo)
         # While loop continues to accumulate collisions while the particle is alive
-        k=0
-        while k < 10:
+        k = 0
+        while k < 2:
             tr.XC.get_tot_xc(XC, p.enrg, int(cell_array[p.cell, 2]), mat_array)
             col_dis = tr.get_col_dist(XC.tot_xc)
-            print(col_dis)
-
+            delta_x = tr.get_delta_x(p.dir, col_dis)
+            surf_cross = tr.det_surf_cross(delta_x, p, geo)
             k += 1
