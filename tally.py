@@ -33,12 +33,15 @@ def init_k_tally(kcode):
 # needs to be converted to p.cell
 class mesh_tally():
     def init_mesh(self, mesh):
-        self.mesh = np.zeros(mesh)
+        self.mesh = np.zeros((mesh,2))
 
-    def accumulate(self, mesh, p_cell, tr_len):
+    def accumulate(self, mesh, p, tr_len):
         for i, x in enumerate(mesh):
-            if i == p_cell:
-                mesh[i] += tr_len
+            if i == p.cell:
+                if p.enrg == 1:
+                    mesh[i][0] += tr_len
+                else:
+                    mesh[i][1] += tr_len
                 break
 
 def init_mesh_tally(geo):

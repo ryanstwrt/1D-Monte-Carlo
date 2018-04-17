@@ -19,7 +19,7 @@ class particle:
     def set_dir(self):
         self.dir = ut.rand_dir()
     def set_alive(self):
-        self.alive = 1
+        self.alive = True
 
 
 # Creates a class for the geometry to easy obtain all relevent information
@@ -33,7 +33,6 @@ class geometry:
         self.pos = cell_array[:, 1]
     def set_mat(self, cell_array):
         self.mat = cell_array[:, 2]
-
 
 
 # Creates a particle with a a set of unique characteristics
