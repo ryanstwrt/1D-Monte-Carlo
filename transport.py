@@ -65,17 +65,19 @@ def get_delta_x(mu, col_dist):
     if -1 >= mu <= 1:
         print('FATAL ERROR: Scattering angle %f was not within bounds of -1 to 1' % mu)
         quit()
-    delta_x = - mu * col_dist
+    delta_x = mu * col_dist
     return delta_x
+
 
 # Determine if a the particle has crossed a surface
 def det_surf_cross(delta_x, p, geo):
     new_pos = p.pos + delta_x
+    #print(p.cell, p.pos, geo.pos[p.cell])
     if delta_x > 0:
-        dist2surf = geo.pos[p.cell+1] - p.pos
+        dist2surf = geo.pos[p.cell] - p.pos
     else:
-        dist2surf = p.pos - geo.pos[p.cell]
-    if abs(delta_x) >= abs(dist2surf):
+        dist2surf = p.pos - geo.pos[p.cell-1]
+    if delta_x >= dist2surf:
         return dist2surf, True
     else:
         return new_pos, False
@@ -84,7 +86,6 @@ def det_surf_cross(delta_x, p, geo):
 # If the particle has not moved outside the cell, simply move the particle
 # to the new position and do not update the cell
 def move_part(p, delta_x):
-    print(p.pos, delta_x)
     new_pos = p.pos + delta_x
     p.pos = new_pos
     return
@@ -94,7 +95,7 @@ def move_part(p, delta_x):
 # update the cell the particle is currently in
 def move_part2surf(p, geo, delta_x):
     if delta_x > 0:
-        if p.cell == geo.mesh[-1]:
+        if p.cell == geo.cells[-1]:
             pass
         else:
             p.cell += 1
@@ -104,7 +105,6 @@ def move_part2surf(p, geo, delta_x):
         else:
             p.cell -= 1
     p.pos = geo.pos[p.cell]
-
 
 # Determine the tracklength if the particle encountered a surface
 def get_tr_ln(delta_x, mu):

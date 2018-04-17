@@ -25,7 +25,6 @@ def rand_pos(mesh, flux):
     pdf_sum = sum(pdf_tbl)
     for i, x in enumerate(flux):
         pdf_tbl[i] /= pdf_sum
-        print(pdf_tbl[i])
     return
 
 
@@ -52,8 +51,7 @@ def rand_col(sigma_1, sigma_t):
 # Grabs the cell number for the particle based on the defined mesh
 def get_cell(pos, cells, mat_pos):
     for i, x in enumerate(cells):
-        if i > 0:
-            if mat_pos[i-1] < pos < mat_pos[i]:
-                return int(cells[i]-1)
-            else:
-                pass
+        if mat_pos[i] < pos < mat_pos[i+1]:
+            return int(cells[i]-1)
+        else:
+            pass

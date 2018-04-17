@@ -54,6 +54,7 @@ def gen_geometry(mesh, cell_array):
     geo.set_mat(cell_array)
     geo.set_cells(cell_array)
     geo.set_pos(cell_array)
+    geo.pos = np.append([0], geo.pos)
     return geo
 
 
@@ -95,16 +96,16 @@ def input_reader(input_dir):
                 break
             num_cells += 1
 
-        # Write the cell array (forcing the cell array to start at 0.0
-        cell_array = np.zeros((num_cells+1, 3))
+        # Write the cell array (forcing the cell array to start at 0.0)
+        cell_array = np.zeros((num_cells, 3))
         file.seek(0)
         for i, line in enumerate(file):
             if line == "\n":
                 break
             geo_line = [x for x in line.split(' ')]
-            cell_array[i+1][0] = int(geo_line[0])
-            cell_array[i+1][1] = cell_array[i-1][1] + float(geo_line[1])
-            cell_array[i+1][2] = int(geo_line[2])
+            cell_array[i][0] = int(geo_line[0])
+            cell_array[i][1] = cell_array[i-1][1] + float(geo_line[1])
+            cell_array[i][2] = int(geo_line[2])
 
         # Write down the kcode information
         k_code = np.zeros(4)
