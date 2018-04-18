@@ -72,43 +72,38 @@ def get_delta_x(mu, col_dist):
 # Determine if a the particle has crossed a surface
 def det_surf_cross(delta_x, p, geo):
     new_pos = p.pos + delta_x
-    #print(p.cell, p.pos, geo.pos[p.cell])
-    if delta_x > 0:
-        dist2surf = geo.pos[p.cell] - p.pos
+    if new_pos >= geo.pos[p.cell+1] or new_pos < geo.pos[p.cell]:
+        return True
     else:
-        dist2surf = p.pos - geo.pos[p.cell-1]
-    if delta_x >= dist2surf:
-        return dist2surf, True
-    else:
-        return new_pos, False
+        return False
 
 
 # If the particle has not moved outside the cell, simply move the particle
 # to the new position and do not update the cell
 def move_part(p, delta_x):
     new_pos = p.pos + delta_x
-    p.pos = new_pos
-    return
+    return new_pos
 
 
 # If the particle has moved to a surface, move the particle to the surface and
 # update the cell the particle is currently in
 def move_part2surf(p, geo, delta_x):
-    if delta_x > 0:
-        if p.cell == geo.cells[-1]:
-            pass
-        else:
-            p.cell += 1
+    new_pos = p.pos + delta_x
+    if new_pos >= geo.pos[p.cell+1]:
+        part_pos = geo.pos[p.cell+1]
+        dist2surf = part_pos - p.pos
     else:
-        if p.cell == 0:
-            pass
-        else:
-            p.cell -= 1
-    p.pos = geo.pos[p.cell]
+        part_pos = geo.pos[p.cell]
+        dist2surf = p.pos - part_pos
+    if part_pos == p.pos:
+        pass
+    p.set_cell(part_pos, geo)
+    return part_pos, dist2surf
+
 
 # Determine the tracklength if the particle encountered a surface
 def get_tr_ln(delta_x, mu):
-    tr_ln = delta_x * mu
+    tr_ln = abs(delta_x / mu)
     return tr_ln
 
 # Returns 0 for absorption, 1 for inscatter, 2 for outscatter

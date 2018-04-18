@@ -12,8 +12,8 @@ class particle:
             self.pos = ut.rand_init_pos(mesh[0], mesh[-1])
         else:
             self.pos = ut.rand_pos(mesh, flux)
-    def set_cell(self, pos, cells, mat_pos):
-        self.cell = ut.get_cell(pos, cells, mat_pos)
+    def set_cell(self, pos, geo):
+        self.cell = ut.get_cell(pos, geo)
     def set_enrg(self):
         self.enrg = 1
     def set_dir(self):
@@ -40,7 +40,7 @@ def gen_particle(keff, history, mesh, flux, geo):
     p = particle()
     p.set_wt(keff)
     p.set_pos(history, geo.pos, flux)
-    p.set_cell(p.pos, geo.cells, geo.pos)
+    p.set_cell(p.pos, geo)
     p.set_enrg()
     p.set_dir()
     p.set_alive()
@@ -53,6 +53,7 @@ def gen_geometry(mesh, cell_array):
     geo.set_mesh(mesh)
     geo.set_mat(cell_array)
     geo.set_cells(cell_array)
+    geo.cells = geo.cells.astype(np.int64)
     geo.set_pos(cell_array)
     geo.pos = np.append([0], geo.pos)
     return geo

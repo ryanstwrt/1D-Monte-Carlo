@@ -49,9 +49,13 @@ def rand_col(sigma_1, sigma_t):
 
 
 # Grabs the cell number for the particle based on the defined mesh
-def get_cell(pos, cells, mat_pos):
-    for i, x in enumerate(cells):
-        if mat_pos[i] < pos < mat_pos[i+1]:
-            return int(cells[i]-1)
-        else:
-            pass
+def get_cell(pos, geo):
+    if pos == geo.pos[0]:
+        return geo.cells[0]
+    elif pos == geo.pos[-1]:
+        return geo.cells[-1]
+    else:
+        for i, x in enumerate(geo.cells):
+            if geo.pos[i] <= pos < geo.pos[i+1]:
+                return geo.cells[i]
+
