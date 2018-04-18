@@ -93,7 +93,7 @@ def move_part2surf(p, geo, delta_x):
         part_pos = geo.pos[p.cell+1]
         dist2surf = part_pos - p.pos
     else:
-        part_pos = geo.pos[p.cell]
+        part_pos = geo.pos[p.cell-1]
         dist2surf = p.pos - part_pos
     if part_pos == p.pos:
         pass

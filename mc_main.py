@@ -23,7 +23,7 @@ for i in range(0, int(kcode[1])):
         p = su.gen_particle(kcode[3], i, mesh, cell_array, geo)
         # While loop continues to accumulate collisions while the particle is alive
         k = 0
-        while k < 100:
+        while p.alive:
             material = int(geo.mat[p.cell])
             xc = tr.get_XC(p.enrg, material, mat_array)
             tl_tot = tr.get_col_dist(xc.tot_xc)
@@ -37,7 +37,6 @@ for i in range(0, int(kcode[1])):
             if surf_cross:
                 p.pos, dist2surf = tr.move_part2surf(p, geo, delta_x)
                 tr_ln = tr.get_tr_ln(dist2surf, p.dir)
-                print(p.pos, p.cell)
                 if p.pos == geo.pos[0] or p.pos == geo.pos[-1]:
                     p.dir = -p.dir
             # If the particle does encounter a collision before the surface
@@ -46,9 +45,7 @@ for i in range(0, int(kcode[1])):
                 p.pos = tr.move_part(p, delta_x)
                 tr_ln = tl_tot
                 col_type = tr.get_col_type(xc, p.enrg)
-                print(col_type)
                 if col_type == 0:
-                    print("dead")
                     p.alive = False
                 elif col_type == 1:
                     pass
@@ -58,7 +55,7 @@ for i in range(0, int(kcode[1])):
 
             mesh_tally.accumulate(mesh_tally.mesh, p, tr_ln)
             k += 1
-    print(mesh_tally.mesh)
+    #print(mesh_tally.mesh)
 
 time1 = time.time()
 print('1D MC took: ', time1-time0, 's to run.')
