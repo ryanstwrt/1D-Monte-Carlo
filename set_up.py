@@ -12,14 +12,14 @@ class particle:
             self.pos = ut.rand_init_pos(mesh[0], mesh[-1])
         else:
             self.pos = ut.rand_pos(mesh, flux)
-    def set_cell(self, pos, cells, mat_pos):
-        self.cell = ut.get_cell(pos, cells, mat_pos)
+    def set_cell(self, pos, geo):
+        self.cell = ut.get_cell(pos, geo)
     def set_enrg(self):
         self.enrg = 1
     def set_dir(self):
         self.dir = ut.rand_dir()
     def set_alive(self):
-        self.alive = 1
+        self.alive = True
 
 
 # Creates a class for the geometry to easy obtain all relevent information
@@ -35,13 +35,12 @@ class geometry:
         self.mat = cell_array[:, 2]
 
 
-
 # Creates a particle with a a set of unique characteristics
 def gen_particle(keff, history, mesh, flux, geo):
     p = particle()
     p.set_wt(keff)
     p.set_pos(history, geo.pos, flux)
-    p.set_cell(p.pos, geo.cells, geo.pos)
+    p.set_cell(p.pos, geo)
     p.set_enrg()
     p.set_dir()
     p.set_alive()
@@ -54,7 +53,9 @@ def gen_geometry(mesh, cell_array):
     geo.set_mesh(mesh)
     geo.set_mat(cell_array)
     geo.set_cells(cell_array)
+    geo.cells = geo.cells.astype(np.int64)
     geo.set_pos(cell_array)
+    geo.pos = np.append([0], geo.pos)
     return geo
 
 
@@ -96,16 +97,16 @@ def input_reader(input_dir):
                 break
             num_cells += 1
 
-        # Write the cell array (forcing the cell array to start at 0.0
-        cell_array = np.zeros((num_cells+1, 3))
+        # Write the cell array (forcing the cell array to start at 0.0)
+        cell_array = np.zeros((num_cells, 3))
         file.seek(0)
         for i, line in enumerate(file):
             if line == "\n":
                 break
             geo_line = [x for x in line.split(' ')]
-            cell_array[i+1][0] = int(geo_line[0])
-            cell_array[i+1][1] = cell_array[i-1][1] + float(geo_line[1])
-            cell_array[i+1][2] = int(geo_line[2])
+            cell_array[i][0] = int(geo_line[0])
+            cell_array[i][1] = cell_array[i-1][1] + float(geo_line[1])
+            cell_array[i][2] = int(geo_line[2])
 
         # Write down the kcode information
         k_code = np.zeros(4)

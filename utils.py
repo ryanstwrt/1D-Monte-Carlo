@@ -11,6 +11,7 @@ def rand_init_pos(lower, upper):
 
 
 # Sample from the flux distribution
+# To Do: Finish this!
 def rand_pos(mesh, flux):
     if len(mesh) != len(flux):
         print("FATAL ERROR: The mesh size (%i) is not equal to the flux size (%i). " % (len(mesh), len(flux)))
@@ -33,25 +34,28 @@ def rand_dir():
     return direction
 
 
-# Return a 0 on scatter and a 1 on absorption
-def rand_col(sigma_s, sigma_t):
-    if sigma_s > sigma_t:
+# Return a True if sigma_1 is sample and a False if not
+def rand_col(sigma_1, sigma_t):
+    if sigma_1 > sigma_t:
         print('FATAL ERROR: Sigma S (%f) is greater than Sigma T(%f)'
-              'Check input file' % (sigma_s, sigma_t))
+              'Check input file' % (sigma_1, sigma_t))
         quit()
-    temp = sigma_s/sigma_t
+    temp = sigma_1/sigma_t
     rand_temp = random()
     if rand_temp < temp:
-        return 0
+        return True
     else:
-        return 1
+        return False
 
 
 # Grabs the cell number for the particle based on the defined mesh
-def get_cell(pos, cells, mat_pos):
-    for i, x in enumerate(cells):
-        if i > 0:
-            if mat_pos[i-1] < pos < mat_pos[i]:
-                return int(cells[i]-1)
-            else:
-                pass
+def get_cell(pos, geo):
+    if pos == geo.pos[0]:
+        return geo.cells[0]
+    elif pos == geo.pos[-1]:
+        return geo.cells[-1]
+    else:
+        for i, x in enumerate(geo.cells):
+            if geo.pos[i] <= pos < geo.pos[i+1]:
+                return geo.cells[i]
+
