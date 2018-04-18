@@ -21,6 +21,12 @@ class k_code_tally:
     def accumulate_k(self, iter, k):
         self.k_tally[iter] = k
 
+    def get_k(self, k, geo, fission_source):
+        new_k = 0
+        for i, fs in enumerate(fission_source):
+            new_k += fs * (geo.pos[i+1]-geo.pos[i])
+        print(new_k)
+
 
 def init_k_tally(kcode):
     k = k_code_tally()
@@ -55,6 +61,7 @@ class mesh_tally():
     def gen_flux(self, num_part, geo):
         for x in geo.cells:
             for i, y in enumerate(self.mesh[x]):
+                #print(y, num_part, geo.pos[x+1] - geo.pos[x])
                 self.flux[x, i] = y / (num_part * (geo.pos[x+1] - geo.pos[x]))
 
     def gen_fission_source(self, geo, mat_array):

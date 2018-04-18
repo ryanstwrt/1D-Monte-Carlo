@@ -90,20 +90,27 @@ def move_part(p, delta_x):
 def move_part2surf(p, geo, delta_x):
     new_pos = p.pos + delta_x
     if new_pos >= geo.pos[p.cell+1]:
-        part_pos = geo.pos[p.cell+1]
-        dist2surf = part_pos - p.pos
+        if p.cell == geo.cells[-1]:
+            part_pos = geo.pos[-1]
+            dist2surf = part_pos - p.pos
+        else:
+            part_pos = geo.pos[p.cell+1]
+            dist2surf = part_pos - p.pos
+            p.set_cell(part_pos, geo)
     else:
-        part_pos = geo.pos[p.cell-1]
-        dist2surf = p.pos - part_pos
-    if part_pos == p.pos:
-        pass
-    p.set_cell(part_pos, geo)
+        if p.cell == geo.cells[0]:
+            part_pos = geo.pos[0]
+            dist2surf = p.pos - part_pos
+        else:
+            part_pos = geo.pos[p.cell-1]
+            dist2surf = p.pos - part_pos
+            p.set_cell(part_pos, geo)
     return part_pos, dist2surf
 
 
 # Determine the tracklength if the particle encountered a surface
 def get_tr_ln(delta_x, mu):
-    tr_ln = abs(delta_x / mu)
+    tr_ln = abs(delta_x * mu)
     return tr_ln
 
 # Returns 0 for absorption, 1 for inscatter, 2 for outscatter
