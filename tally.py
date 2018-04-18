@@ -3,19 +3,23 @@ import transport as tr
 
 class k_code_tally:
     def num_par(self, kcode):
-        self.num_par = kcode[0]
+        self.num_par = int(kcode[0])
 
     def num_gen(self, kcode):
-        self.num_gen = kcode[1]
+        self.num_gen = int(kcode[1])
 
     def num_skip_gen(self, kcode):
-        self.num_skip_gen = kcode[2]
+        self.num_skip_gen = int(kcode[2])
 
     def init_k(self, kcode):
         self.init_k = kcode[3]
 
     def k_tally(self, k):
-        self.k_tally = np.zeros(int(k.num_gen - k.num_skip_gen))
+        self.k_tally = np.zeros(k.num_gen - k.num_skip_gen)
+        self.k_tally[0] = 1.0
+
+    def accumulate_k(self, iter, k):
+        self.k_tally[iter] = k
 
 
 def init_k_tally(kcode):
@@ -65,7 +69,7 @@ class mesh_tally():
             fiss_f = xc.fiss_xc
             xc.get_fiss_xc(2, x , mat_array)
             fiss_t = xc.fiss_xc
-            self.fission_source = nu_f * fiss_f * self.flux[i, 0] + nu_t * fiss_t * self.flux[i, 1]
+            self.fission_source[i] = nu_f * fiss_f * self.flux[i, 0] + nu_t * fiss_t * self.flux[i, 1]
 
 
 def init_mesh_tally(geo):
