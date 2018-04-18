@@ -16,7 +16,8 @@ def rand_pos(mesh, flux):
     if len(mesh) != len(flux):
         print("FATAL ERROR: The mesh size (%i) is not equal to the flux size (%i). " % (len(mesh), len(flux)))
         quit()
-    pdf_tbl = np.zeros_like(flux)
+    pdf_tbl = np.zeros(len(flux))
+    #print(flux)
     for i, x in enumerate(flux):
         if i == 0:
             pdf_tbl[i] = x
@@ -25,6 +26,14 @@ def rand_pos(mesh, flux):
     pdf_sum = sum(pdf_tbl)
     for i, x in enumerate(flux):
         pdf_tbl[i] /= pdf_sum
+    rand = random()
+    print(pdf_tbl)
+    for i, x in enumerate(pdf_tbl):
+        print(pdf_tbl[i])
+        if rand <= pdf_tbl[i]:
+            cell = pdf_tbl[i]
+            break
+    print(cell)
     return
 
 

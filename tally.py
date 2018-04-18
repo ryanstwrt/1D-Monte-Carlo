@@ -30,10 +30,12 @@ def init_k_tally(kcode):
 
 
 # Right now it just takes in a dummy cell
-# needs to be converted to p.cell
 class mesh_tally():
     def init_mesh(self, mesh):
-        self.mesh = np.zeros((mesh,2))
+        self.mesh = np.zeros((mesh, 2))
+
+    def init_flux(self, mesh):
+        self.flux = np.zeros((mesh, 2))
 
     def accumulate(self, mesh, p, tr_len):
         for i, x in enumerate(mesh):
@@ -44,16 +46,16 @@ class mesh_tally():
                     mesh[i][1] += tr_len
                 break
 
+    def gen_flux(self, num_part, geo):
+        for x in geo.cells:
+            for i, y in enumerate(self.mesh[x]):
+                self.flux[x, i] = y / (num_part * (geo.pos[x+1] - geo.pos[x]))
+                print(self.flux[x, i], num_part, geo.pos[x+1], geo.pos[x], y)
+
+
 def init_mesh_tally(geo):
     mt = mesh_tally()
-    mt.init_mesh(len(geo.mesh))
+    mt.init_mesh(len(geo.cells))
+    mt.init_flux(len(geo.cells))
     return mt
 
-#mesh_tal = init_mesh_tally(su.geo)
-#k = init_k_tally(su.k_code)
-
-#for x in range(len(mesh_tal.mesh)):
-#    cell = 41
-#    tr_len = x + 1
-#    mesh_tal.accumulate(mesh_tal.mesh, cell, tr_len)
-#print(mesh_tal.mesh)

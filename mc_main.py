@@ -15,14 +15,16 @@ mat_array = su.get_data(data_file)
 cell_array, mesh, kcode = su.input_reader(input_file)
 geo = su.gen_geometry(mesh, cell_array)
 mesh_tally = tally.init_mesh_tally(geo)
+print(len(geo.mesh))
 # First loop loops over the number of total generations in the simulation
 for i in range(0, int(kcode[1])):
     # Second for loop loops over the number of particles per generation
+    print(i)
+    k = 0
     for j in range(0, int(kcode[0])):
         # Generates a new particle each time
         p = su.gen_particle(kcode[3], i, mesh, cell_array, geo)
         # While loop continues to accumulate collisions while the particle is alive
-        k = 0
         while p.alive:
             material = int(geo.mat[p.cell])
             xc = tr.get_XC(p.enrg, material, mat_array)
@@ -54,8 +56,10 @@ for i in range(0, int(kcode[1])):
                     p.enrg = 2
 
             mesh_tally.accumulate(mesh_tally.mesh, p, tr_ln)
-            k += 1
-    #print(mesh_tally.mesh)
+        k += 1
+    mesh_tally.gen_flux(k, geo)
+    print(mesh_tally.mesh)
+    print(len(mesh_tally.mesh))
 
 time1 = time.time()
 print('1D MC took: ', time1-time0, 's to run.')
