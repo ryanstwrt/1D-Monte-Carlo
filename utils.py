@@ -10,30 +10,28 @@ def rand_init_pos(lower, upper):
     return pos
 
 
-# Sample from the flux distribution
+# Sample from the fission source distribution
 # To Do: Finish this!
-def rand_pos(mesh, flux):
-    if len(mesh) != len(flux):
-        print("FATAL ERROR: The mesh size (%i) is not equal to the flux size (%i). " % (len(mesh), len(flux)))
+def rand_pos(mesh, fission_src):
+    if len(mesh) != len(fission_src):
+        print("FATAL ERROR: The mesh size (%i) is not equal to the flux size (%i). " % (len(mesh), len(fission_src)))
         quit()
-    pdf_tbl = np.zeros(len(flux))
-    #print(flux)
-    for i, x in enumerate(flux):
+    norm_fission_src = fission_src / sum(fission_src)
+    cum_fission_src = np.zeros_like(norm_fission_src)
+    for i, src in enumerate(norm_fission_src):
         if i == 0:
-            pdf_tbl[i] = x
+            cum_fission_src[i] = src
         else:
-            pdf_tbl[i] = x + pdf_tbl[i-1]
-    pdf_sum = sum(pdf_tbl)
-    for i, x in enumerate(flux):
-        pdf_tbl[i] /= pdf_sum
+            cum_fission_src[i] = src + cum_fission_src[i-1]
+    sum_2 = sum(norm_fission_src)
     rand = random()
-    print(pdf_tbl)
+    ####To Do: Sample from the cumulative distribution!!
+    #####
     for i, x in enumerate(pdf_tbl):
         print(pdf_tbl[i])
         if rand <= pdf_tbl[i]:
             cell = pdf_tbl[i]
             break
-    print(cell)
     return
 
 

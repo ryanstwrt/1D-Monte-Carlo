@@ -21,9 +21,13 @@ k_tally = tally.init_k_tally(kcode)
 for i in range(0, int(kcode[1])):
     # Second for loop loops over the number of particles per generation
     k = 0
-    for j in range(int(kcode[0])):
+    for j in range(5):#int(kcode[0])):
         # Generates a new particle each time
-        p = su.gen_particle(k_tally.k_tally[i], i, mesh, cell_array, geo)
+        if i == 0:
+            p = su.gen_particle(k_tally.k_tally[i], i, cell_array, geo)
+        else:
+            p = su.gen_particle(k_tally.k_tally[i], i, mesh_tally.fission_source, geo)
+
         # While loop continues to accumulate collisions while the particle is alive
 
         while p.alive:
@@ -57,13 +61,10 @@ for i in range(0, int(kcode[1])):
 
             mesh_tally.accumulate(mesh_tally.mesh, p, tr_ln)
         k += 1
-    #print(mesh_tally.mesh)
+
     mesh_tally.gen_flux(k, geo)
-    #print(mesh_tally.flux)
     mesh_tally.gen_fission_source(geo, mat_array)
     k_tally.get_k(k_tally.k_tally[i], geo, mesh_tally.fission_source)
-    #print(mesh_tally.fission_source)
-    #print(k_tally.k_tally[i])
     plot.plot_flux(mesh_tally.flux)
     plot.plot_flux(mesh_tally.fission_source)
 

@@ -7,11 +7,11 @@ class particle:
     '''Creates a class for the particle'''
     def set_wt(self, keff):
         self.wt = keff
-    def set_pos(self, history, mesh, cells, flux):
+    def set_pos(self, history, mesh, cells, fission_source):
         if history == 0:
             self.pos = ut.rand_init_pos(mesh[0], mesh[-1])
         else:
-            self.pos = ut.rand_pos(cells, flux)
+            self.pos = ut.rand_pos(cells, fission_source)
     def set_cell(self, pos, geo):
         self.cell = ut.get_cell(pos, geo)
     def set_enrg(self):
@@ -36,10 +36,10 @@ class geometry:
 
 
 # Creates a particle with a a set of unique characteristics
-def gen_particle(keff, history, mesh, flux, geo):
+def gen_particle(keff, history, fission_source, geo):
     p = particle()
     p.set_wt(keff)
-    p.set_pos(history, geo.pos, geo.cells, flux)
+    p.set_pos(history, geo.pos, geo.cells, fission_source)
     p.set_cell(p.pos, geo)
     p.set_enrg()
     p.set_dir()
