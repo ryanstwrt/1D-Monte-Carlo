@@ -1,6 +1,5 @@
-import set_up as su
 import numpy as np
-
+import transport as tr
 
 class k_code_tally:
     def num_par(self, kcode):
@@ -37,6 +36,9 @@ class mesh_tally():
     def init_flux(self, mesh):
         self.flux = np.zeros((mesh, 2))
 
+    def init_fission_source(self, mesh):
+        self.fission_source = np.zeros(mesh)
+
     def accumulate(self, mesh, p, tr_len):
         for i, x in enumerate(mesh):
             if i == p.cell:
@@ -50,12 +52,26 @@ class mesh_tally():
         for x in geo.cells:
             for i, y in enumerate(self.mesh[x]):
                 self.flux[x, i] = y / (num_part * (geo.pos[x+1] - geo.pos[x]))
-                print(self.flux[x, i], num_part, geo.pos[x+1], geo.pos[x], y)
+
+    def gen_fission_source(self, geo, mat_array):
+        xc = tr.get_XC(1, 0, mat_array)
+        for i, y in enumerate(geo.mat):
+            x = int(y)
+            xc.get_nu(1, x, mat_array)
+            nu_f = xc.nu
+            xc.get_nu(2, x, mat_array)
+            nu_t = xc.nu
+            xc.get_fiss_xc(1, x, mat_array)
+            fiss_f = xc.fiss_xc
+            xc.get_fiss_xc(2, x , mat_array)
+            fiss_t = xc.fiss_xc
+            self.fission_source = nu_f * fiss_f * self.flux[i, 0] + nu_t * fiss_t * self.flux[i, 1]
 
 
 def init_mesh_tally(geo):
     mt = mesh_tally()
     mt.init_mesh(len(geo.cells))
     mt.init_flux(len(geo.cells))
+    mt.init_fission_source(len(geo.cells))
     return mt
 

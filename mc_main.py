@@ -2,6 +2,7 @@ import set_up as su
 import utils as ut
 import transport as tr
 import tally
+import plotter as plot
 import time
 
 
@@ -58,6 +59,9 @@ for i in range(0, int(kcode[1])):
             mesh_tally.accumulate(mesh_tally.mesh, p, tr_ln)
         k += 1
     mesh_tally.gen_flux(k, geo)
+    #plot.plot_flux(mesh_tally.flux)
+    mesh_tally.gen_fission_source(geo, mat_array)
+
     print(mesh_tally.mesh)
     print(len(mesh_tally.mesh))
 
