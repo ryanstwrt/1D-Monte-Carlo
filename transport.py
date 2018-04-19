@@ -37,6 +37,7 @@ def move_part(p, delta_x):
 # update the cell the particle is currently in
 def move_part2surf(p, geo, delta_x):
     new_pos = p.pos + delta_x
+    prev_cell = p.cell
     if new_pos >= geo.pos[p.cell+1]:
         if p.cell == geo.cells[-1]:
             part_pos = geo.pos[-1]
@@ -53,7 +54,7 @@ def move_part2surf(p, geo, delta_x):
             part_pos = geo.pos[p.cell-1]
             dist2surf = p.pos - part_pos
             p.set_cell(part_pos, geo)
-    return part_pos, dist2surf
+    return part_pos, dist2surf, prev_cell
 
 
 # Determine the tracklength if the particle encountered a surface

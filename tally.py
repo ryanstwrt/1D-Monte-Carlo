@@ -42,11 +42,14 @@ class tally():
     def init_current(self, mesh):
         self.current = np.zeros((mesh, 2))
 
-    def accumulate(self, p, tr_len):
+    def init_mesh(self):
+        self.mesh = np.zeros((128,2))
+
+    def accumulate(self, p, prev_cell, tr_len):
         if p.enrg == 1:
-            self.track_length[p.cell][0] += p.wt * tr_len
+            self.track_length[prev_cell][0] += p.wt * tr_len
         else:
-            self.track_length[p.cell][1] += p.wt * tr_len
+            self.track_length[prev_cell][1] += p.wt * tr_len
 
     def gen_flux(self, num_part, geo):
         for x in geo.cells:
@@ -74,6 +77,14 @@ class tally():
         else:
             self.current[prev_cell][cur_enrg] -= 1
 
+    def accumulate_mesh(self, p, tl):
+        cur_enrg = p.enrg -1
+        delta_x = 0.15625
+        mesh_pos = 0
+        for i, x in enumerate(self.mesh):
+            if mesh_pos < p.pos <= (mesh_pos + delta_x):
+                self.mesh[i][cur_enrg] += p.wt * tl
+            mesh_pos += delta_x
 
     def clear_fission_source(self):
         self.fission_source[:] = 0
@@ -81,8 +92,14 @@ class tally():
     def clear_flux(self):
         self.flux[:] = 0
 
-    def clear_mesh(self):
+    def clear_track_length(self):
         self.track_length[:] = 0
+
+    def clear_current(self):
+        self.current[:] = 0
+
+    def clear_mesh (self):
+        self.mesh[:] = 0
 
 
 def init_k_tally(kcode):
@@ -98,6 +115,7 @@ def init_k_tally(kcode):
 def init_track_length_tally(geo):
     mt = tally()
     mt.init_track_length(len(geo.cells))
+    mt.init_mesh()
     mt.init_current(len(geo.cells))
     mt.init_flux(len(geo.cells))
     mt.init_fission_source(len(geo.cells))

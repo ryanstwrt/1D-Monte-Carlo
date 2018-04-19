@@ -45,26 +45,29 @@ for i in range(0, int(kcode[1])):
             # direction. This also determines if the particle encounters
             # a problem boundary, in our case the particle is reflected.
             if surf_cross:
-                prev_cell = p.cell
-                p.pos, dist2surf = tr.move_part2surf(p, geo, delta_x)
+                p.pos, dist2surf, prev_cell = tr.move_part2surf(p, geo, delta_x)
                 tr_ln = tr.get_tr_ln(dist2surf, p.dir)
                 if p.pos == geo.pos[0] or p.pos == geo.pos[-1]:
                     p.dir = -p.dir
-                tally.accumulate(p, tr_ln)
+                tally.accumulate(p, prev_cell, tr_ln)
                 tally.accumulate_current(p.cell, prev_cell, p.enrg)
+                tally.accumulate_mesh(p, tr_ln)
 
             # If the particle does encounter a collision before the surface
             # then we sample to determine what type of collision occurs
             else:
                 p.pos = tr.move_part(p, delta_x)
                 tr_ln = tl_tot
-                tally.accumulate(p, tr_ln)
+                tally.accumulate(p, p.cell, tr_ln)
+                tally.accumulate_mesh(p, tr_ln)
                 col_type = tr.get_col_type(xc, p.enrg)
                 if col_type == 0:
                     p.alive = False
-                elif col_type == 2:
+                elif col_type == 1:
                     p.set_dir()
+                else:
                     p.enrg = 2
+                    p.set_dir()
 
         k += 1
 
@@ -79,7 +82,7 @@ for i in range(0, int(kcode[1])):
     tally.gen_fission_source(geo, mat_array)
 
     # Now that we have generated our new flux/fission source, erase the tracklength tally
-    tally.clear_mesh()
+    tally.clear_track_length()
     if i < k_tally.num_gen:
         print(k_tally.k_tally[i])
         new_k = k_tally.get_k(k_tally.k_tally[i], geo, tally.fission_source)
@@ -88,10 +91,12 @@ for i in range(0, int(kcode[1])):
     plot.plot_flux(tally.current)
     plot.plot_flux(tally.flux)
     plot.plot_flux(tally.fission_source)
+    plot.plot_flux(tally.mesh)
     if i > 98:
         plot.plot_flux(tally.flux)
         plot.plot_flux(tally.fission_source)
-
+    tally.clear_current()
+    tally.clear_mesh()
 
 time1 = time.time()
 print('1D MC took: ', time1-time0, 's to run.')
