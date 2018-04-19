@@ -3,6 +3,7 @@ import numpy as np
 
 # Creates a class for the particle which contains the particles weight,
 # position, cell, energy (where energy 1 is fast), and direction
+
 class particle:
     '''Creates a class for the particle'''
     def set_wt(self, keff):
@@ -26,7 +27,7 @@ class particle:
 # regarding cells, mesh XC, etc.
 class geometry:
     def set_mesh(self, mesh):
-        self.mesh = mesh
+        self.track_length = mesh
     def set_cells(self, cell_array):
         self.cells = cell_array[:, 0]
     def set_pos(self, cell_array):
@@ -119,3 +120,53 @@ def input_reader(input_dir):
                 k_code[i-1] = float(mat_line[1])
 
         return cell_array, mesh, k_code
+
+
+# create a XC set for the current particle
+def get_XC(enrg, material, mat_array):
+    xc = XC()
+    xc.get_tot_xc(enrg, material, mat_array)
+    xc.get_downscat_xc(enrg, material, mat_array)
+    xc.get_inscat_xc(enrg, material, mat_array)
+    xc.get_fiss_xc(enrg, material, mat_array)
+    xc.get_nu(enrg, material, mat_array)
+    xc.get_xi(enrg, material, mat_array)
+    return xc
+
+
+class XC():
+    def get_tot_xc(self, enrg, material, mat_array):
+        if enrg == 1:
+            self.tot_xc = mat_array[material][1]
+        else:
+            self.tot_xc = mat_array[material][7]
+
+    def get_inscat_xc(self, enrg, material, mat_array):
+        if enrg == 1:
+            self.inscat_xc = mat_array[material, 2]
+        else:
+            self.inscat_xc = mat_array[material, 8]
+
+    def get_downscat_xc(self, enrg, material, mat_array):
+        if enrg == 1:
+            self.downscat_xc = mat_array[material, 3]
+        else:
+            self.downscat_xc = mat_array[material, 9]
+
+    def get_fiss_xc(self, enrg, material, mat_array):
+        if enrg == 1:
+            self.fiss_xc = mat_array[material, 4]
+        else:
+            self.fiss_xc = mat_array[material, 10]
+
+    def get_nu(self, enrg, material, mat_array):
+        if enrg == 1:
+            self.nu = mat_array[material, 5]
+        else:
+            self.nu = mat_array[material, 11]
+
+    def get_xi(self, enrg, material, mat_array):
+        if enrg == 1:
+            self.xi = mat_array[material, 6]
+        else:
+            self.xi = mat_array[material, 12]

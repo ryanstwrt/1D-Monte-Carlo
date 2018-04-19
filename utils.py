@@ -11,13 +11,13 @@ def rand_init_pos(lower, upper):
 
 
 # Sample from the fission source distribution
-# To Do: Finish this!
 def rand_pos(geo, fission_src):
     if len(geo.cells) != len(fission_src):
-        print("FATAL ERROR: The mesh size (%i) is not equal to the flux size (%i). " % (len(mesh), len(fission_src)))
+        print("FATAL ERROR: The mesh size (%i) is not equal to the flux size (%i). " % (len(geo.cells), len(fission_src)))
         quit()
     norm_fission_src = fission_src / sum(fission_src)
     cum_fission_src = np.zeros_like(norm_fission_src)
+    test = sum(cum_fission_src)
     for i, src in enumerate(norm_fission_src):
         if i == 0:
             cum_fission_src[i] = src
@@ -40,7 +40,7 @@ def rand_dir():
     return direction
 
 
-# Return a True if sigma_1 is sample and a False if not
+# Return a True if sigma_1 is sampled and a False if not
 def rand_col(sigma_1, sigma_t):
     if sigma_1 > sigma_t:
         print('FATAL ERROR: Sigma S (%f) is greater than Sigma T(%f)'

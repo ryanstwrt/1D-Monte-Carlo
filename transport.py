@@ -1,58 +1,6 @@
 import utils as ut
 import numpy as np
-import set_up as su
 from random import *
-
-
-class XC():
-    def get_tot_xc(self, enrg, material, mat_array):
-        if enrg == 1:
-            self.tot_xc = mat_array[material][1]
-        else:
-            self.tot_xc = mat_array[material][7]
-
-    def get_inscat_xc(self, enrg, material, mat_array):
-        if enrg == 1:
-            self.inscat_xc = mat_array[material, 2]
-        else:
-            self.inscat_xc = mat_array[material, 8]
-
-    def get_downscat_xc(self, enrg, material, mat_array):
-        if enrg == 1:
-            self.downscat_xc = mat_array[material, 3]
-        else:
-            self.downscat_xc = mat_array[material, 9]
-
-    def get_fiss_xc(self, enrg, material, mat_array):
-        if enrg == 1:
-            self.fiss_xc = mat_array[material, 4]
-        else:
-            self.fiss_xc = mat_array[material, 10]
-
-    def get_nu(self, enrg, material, mat_array):
-        if enrg == 1:
-            self.nu = mat_array[material, 5]
-        else:
-            self.nu = mat_array[material, 11]
-
-    def get_xi(self, enrg, material, mat_array):
-        if enrg == 1:
-            self.xi = mat_array[material, 6]
-        else:
-            self.xi = mat_array[material, 12]
-
-
-# create a XC set for the current particle
-def get_XC(enrg, material, mat_array):
-    xc = XC()
-    xc.get_tot_xc(enrg, material, mat_array)
-    xc.get_downscat_xc(enrg, material, mat_array)
-    xc.get_inscat_xc(enrg, material, mat_array)
-    xc.get_fiss_xc(enrg, material, mat_array)
-    xc.get_nu(enrg, material, mat_array)
-    xc.get_xi(enrg, material, mat_array)
-    return xc
-
 
 # Get a random path length traveled based on Transport XC
 def get_col_dist(sigma_t):
@@ -110,18 +58,18 @@ def move_part2surf(p, geo, delta_x):
 
 # Determine the tracklength if the particle encountered a surface
 def get_tr_ln(delta_x, mu):
-    tr_ln = abs(delta_x * mu)
+    tr_ln = abs(delta_x / mu)
     return tr_ln
 
-# Returns 0 for absorption, 1 for inscatter, 2 for outscatter
+# Returns 0 for absorption, 1 for inscatter, 2 for downscatter
 def get_col_type(XC, erng):
     sigma_s = XC.downscat_xc + XC.inscat_xc
-    col_type = ut.rand_col(sigma_s, XC.tot_xc)
-    if not col_type:
+    scatt_coll = ut.rand_col(sigma_s, XC.tot_xc)
+    if not scatt_coll:
         return 0
     else:
-        scat_type = ut.rand_col(XC.inscat_xc, sigma_s)
-        if scat_type:
+        down_scat = ut.rand_col(XC.inscat_xc, sigma_s)
+        if not down_scat:
             return 1
         else:
             return 2
