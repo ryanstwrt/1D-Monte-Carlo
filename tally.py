@@ -25,7 +25,7 @@ class k_code_tally:
         new_k = 0
         for i, fs in enumerate(fission_source):
             new_k += fs * (geo.pos[i+1]-geo.pos[i])
-        print(new_k)
+        print("keff = ", new_k)
 
 
 def init_k_tally(kcode):
@@ -61,7 +61,6 @@ class mesh_tally():
     def gen_flux(self, num_part, geo):
         for x in geo.cells:
             for i, y in enumerate(self.mesh[x]):
-                #print(y, num_part, geo.pos[x+1] - geo.pos[x])
                 self.flux[x, i] = y / (num_part * (geo.pos[x+1] - geo.pos[x]))
 
     def gen_fission_source(self, geo, mat_array):

@@ -12,8 +12,8 @@ def rand_init_pos(lower, upper):
 
 # Sample from the fission source distribution
 # To Do: Finish this!
-def rand_pos(mesh, fission_src):
-    if len(mesh) != len(fission_src):
+def rand_pos(geo, fission_src):
+    if len(geo.cells) != len(fission_src):
         print("FATAL ERROR: The mesh size (%i) is not equal to the flux size (%i). " % (len(mesh), len(fission_src)))
         quit()
     norm_fission_src = fission_src / sum(fission_src)
@@ -23,16 +23,15 @@ def rand_pos(mesh, fission_src):
             cum_fission_src[i] = src
         else:
             cum_fission_src[i] = src + cum_fission_src[i-1]
-    sum_2 = sum(norm_fission_src)
     rand = random()
-    ####To Do: Sample from the cumulative distribution!!
-    #####
-    for i, x in enumerate(pdf_tbl):
-        print(pdf_tbl[i])
-        if rand <= pdf_tbl[i]:
-            cell = pdf_tbl[i]
+    # This gets us the cell we are looking for
+    for i, x in enumerate(cum_fission_src):
+        if rand <= x:
+            cell = i
             break
-    return
+    # Now we need to sample the cell to get the position
+    pos = rand_init_pos(geo.pos[cell], geo.pos[cell+1])
+    return pos
 
 
 # Get a random direction based on isotropic scattering/emission

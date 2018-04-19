@@ -65,8 +65,8 @@ for i in range(0, int(kcode[1])):
     mesh_tally.gen_flux(k, geo)
     mesh_tally.gen_fission_source(geo, mat_array)
     k_tally.get_k(k_tally.k_tally[i], geo, mesh_tally.fission_source)
-    plot.plot_flux(mesh_tally.flux)
-    plot.plot_flux(mesh_tally.fission_source)
+    #plot.plot_flux(mesh_tally.flux)
+    #plot.plot_flux(mesh_tally.fission_source)
 
 
 time1 = time.time()
