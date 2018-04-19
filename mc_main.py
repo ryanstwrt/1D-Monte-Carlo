@@ -30,11 +30,8 @@ for i in range(0, int(kcode[1])):
             p = su.gen_particle(k_tally.k_tally[i], i, cell_array, geo)
         else:
             p = su.gen_particle(k_tally.k_tally[i], i, tally.fission_source, geo)
+
         # While loop continues to accumulate collisions while the particle is alive
-        if geo.cells[p.cell] >= 24:
-            test += 1
-        if geo.cells[p.cell] < 24:
-            test2 += 1
         while p.alive:
 
             material = int(geo.mat[p.cell])
@@ -48,18 +45,20 @@ for i in range(0, int(kcode[1])):
             # direction. This also determines if the particle encounters
             # a problem boundary, in our case the particle is reflected.
             if surf_cross:
+                prev_cell = p.cell
                 p.pos, dist2surf = tr.move_part2surf(p, geo, delta_x)
                 tr_ln = tr.get_tr_ln(dist2surf, p.dir)
                 if p.pos == geo.pos[0] or p.pos == geo.pos[-1]:
                     p.dir = -p.dir
-                tally.accumulate(tally.track_length, p, tr_ln)
+                tally.accumulate(p, tr_ln)
+                tally.accumulate_current(p.cell, prev_cell, p.enrg)
 
             # If the particle does encounter a collision before the surface
             # then we sample to determine what type of collision occurs
             else:
                 p.pos = tr.move_part(p, delta_x)
                 tr_ln = tl_tot
-                tally.accumulate(tally.track_length, p, tr_ln)
+                tally.accumulate(p, tr_ln)
                 col_type = tr.get_col_type(xc, p.enrg)
                 if col_type == 0:
                     p.alive = False
@@ -85,8 +84,10 @@ for i in range(0, int(kcode[1])):
         print(k_tally.k_tally[i])
         new_k = k_tally.get_k(k_tally.k_tally[i], geo, tally.fission_source)
         k_tally.accumulate_k(i+1, new_k)
-    #print(tally.flux)
 
+    plot.plot_flux(tally.current)
+    plot.plot_flux(tally.flux)
+    plot.plot_flux(tally.fission_source)
     if i > 98:
         plot.plot_flux(tally.flux)
         plot.plot_flux(tally.fission_source)
