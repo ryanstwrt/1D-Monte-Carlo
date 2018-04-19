@@ -15,7 +15,7 @@ class k_code_tally:
         self.init_k = kcode[3]
 
     def k_tally(self, k):
-        self.k_tally = np.zeros(k.num_gen - k.num_skip_gen)
+        self.k_tally = np.zeros(k.num_gen)
         self.k_tally[0] = 1.0
 
     def accumulate_k(self, iter, k):
@@ -76,6 +76,12 @@ class mesh_tally():
             xc.get_fiss_xc(2, x , mat_array)
             fiss_t = xc.fiss_xc
             self.fission_source[i] = nu_f * fiss_f * self.flux[i, 0] + nu_t * fiss_t * self.flux[i, 1]
+
+    def clear_fission_source(self):
+        self.fission_source[:] = 0
+
+    def clear_flux(self):
+        self.flux[:] = 0
 
 
 def init_mesh_tally(geo):
