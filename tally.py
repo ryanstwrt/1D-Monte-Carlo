@@ -34,16 +34,16 @@ class tally():
         self.track_length = np.zeros((mesh, 2))
 
     def init_flux(self, mesh):
-        self.flux = np.zeros((mesh, 2))
+        self.flux = np.zeros((mesh, 4))
 
     def init_fission_source(self, mesh):
         self.fission_source = np.zeros(mesh)
 
     def init_current(self, mesh):
-        self.current = np.zeros((mesh, 2))
+        self.current = np.zeros((mesh, 4))
 
     def init_mesh(self):
-        self.mesh = np.zeros((128,2))
+        self.mesh = np.zeros((128, 2))
 
     def accumulate(self, p, prev_cell, tr_len):
         if p.enrg == 1:
@@ -55,6 +55,8 @@ class tally():
         for x in geo.cells:
             for i, y in enumerate(self.track_length[x]):
                 self.flux[x, i] = y / (num_part * (geo.pos[x+1] - geo.pos[x]))
+                self.flux[x, i+2] = (y / (num_part * (geo.pos[x+1] - geo.pos[x]))) ** 2
+
 
     def gen_fission_source(self, geo, mat_array):
         xc = set_up.get_XC(1, 0, mat_array)
@@ -70,12 +72,16 @@ class tally():
             fiss_t = xc.fiss_xc
             self.fission_source[i] = nu_f * fiss_f * self.flux[i, 0] + nu_t * fiss_t * self.flux[i, 1]
 
-    def accumulate_current(self, cur_cell, prev_cell, energy):
-        cur_enrg = energy -1
-        if cur_cell > prev_cell:
-            self.current[prev_cell][cur_enrg] += 1
+    def accumulate_current(self, p, prev_cell):
+        cur_enrg = p.enrg -1
+        if p.cell > prev_cell:
+            self.current[p.cell][cur_enrg] += p.wt
         else:
-            self.current[prev_cell][cur_enrg] -= 1
+            self.current[prev_cell][cur_enrg] -= p.wt
+        if p.cell > prev_cell:
+            self.current[p.cell][cur_enrg+2] += p.wt ** 2
+        else:
+            self.current[p.cell][cur_enrg+2] -= p.wt ** 2
 
     def accumulate_mesh(self, p, tl):
         cur_enrg = p.enrg -1

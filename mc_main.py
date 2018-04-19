@@ -1,7 +1,7 @@
 import set_up as su
 import transport as tr
 import tally as tal
-import plotter as plot
+import post_process as pp
 import time
 
 
@@ -50,7 +50,7 @@ for i in range(0, int(kcode[1])):
                 if p.pos == geo.pos[0] or p.pos == geo.pos[-1]:
                     p.dir = -p.dir
                 tally.accumulate(p, prev_cell, tr_ln)
-                tally.accumulate_current(p.cell, prev_cell, p.enrg)
+                tally.accumulate_current(p, prev_cell)
                 tally.accumulate_mesh(p, tr_ln)
 
             # If the particle does encounter a collision before the surface
@@ -70,8 +70,6 @@ for i in range(0, int(kcode[1])):
                     p.set_dir()
 
         k += 1
-
-    print(test, test2)
     # Clear the previous generations flux/fission source to make room for the new flux
     # and fission source
     tally.clear_fission_source()
@@ -88,13 +86,17 @@ for i in range(0, int(kcode[1])):
         new_k = k_tally.get_k(k_tally.k_tally[i], geo, tally.fission_source)
         k_tally.accumulate_k(i+1, new_k)
 
-    plot.plot_flux(tally.current)
-    plot.plot_flux(tally.flux)
-    plot.plot_flux(tally.fission_source)
-    plot.plot_flux(tally.mesh)
-    if i > 98:
-        plot.plot_flux(tally.flux)
-        plot.plot_flux(tally.fission_source)
+
+    if i > 48:
+        thermal_flux = pp.pin_cell_average_flux(tally.flux[:, 1])
+        fast_flux = pp.pin_cell_average_flux(tally.flux[:, 0])
+        pp.plot_flux(thermal_flux)
+        pp.plot_flux(fast_flux)
+        pp.plot_flux(tally.current[:, :2])
+        pp.plot_flux(tally.flux[:, :2])
+        pp.plot_flux(tally.fission_source)
+        pp.plot_flux(tally.mesh)
+        pp.plot_flux(k_tally.k_tally)
     tally.clear_current()
     tally.clear_mesh()
 
