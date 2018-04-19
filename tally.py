@@ -76,6 +76,7 @@ class tally():
     def clear_mesh(self):
         self.track_length[:] = 0
 
+
 def init_k_tally(kcode):
     k = k_code_tally()
     k.num_par(kcode)
@@ -84,6 +85,7 @@ def init_k_tally(kcode):
     k.init_k(kcode)
     k.k_tally(k)
     return k
+
 
 def init_track_length_tally(geo):
     mt = tally()

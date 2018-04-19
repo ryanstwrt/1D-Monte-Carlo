@@ -7,7 +7,7 @@ import numpy as np
 class particle:
     '''Creates a class for the particle'''
     def set_wt(self, keff):
-        self.wt = keff
+        self.wt = 1 / keff
     def set_pos(self, history, geo, fission_source):
         if history == 0:
             self.pos = ut.rand_init_pos(geo.pos[0], geo.pos[-1])

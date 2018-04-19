@@ -1,7 +1,6 @@
-import set_up
 import set_up as su
 import transport as tr
-import tally
+import tally as tal
 import plotter as plot
 import time
 
@@ -15,8 +14,8 @@ input_file = "Input_File.txt"
 mat_array = su.get_data(data_file)
 cell_array, mesh, kcode = su.input_reader(input_file)
 geo = su.gen_geometry(mesh, cell_array)
-tally = tally.init_track_length_tally(geo)
-k_tally = tally.init_k_tally(kcode)
+tally = tal.init_track_length_tally(geo)
+k_tally = tal.init_k_tally(kcode)
 # First loop loops over the number of total generations in the simulation
 for i in range(0, int(kcode[1])):
     # Second for loop loops over the number of particles per generation
@@ -39,7 +38,7 @@ for i in range(0, int(kcode[1])):
         while p.alive:
 
             material = int(geo.mat[p.cell])
-            xc = set_up.get_XC(p.enrg, material, mat_array)
+            xc = su.get_XC(p.enrg, material, mat_array)
             tl_tot = tr.get_col_dist(xc.tot_xc)
             delta_x = tr.get_delta_x(p.dir, tl_tot)
             surf_cross = tr.det_surf_cross(delta_x, p, geo)
@@ -88,9 +87,9 @@ for i in range(0, int(kcode[1])):
         k_tally.accumulate_k(i+1, new_k)
     #print(tally.flux)
 
-    #if i > 98:
-    plot.plot_flux(tally.flux)
-    plot.plot_flux(tally.fission_source)
+    if i > 98:
+        plot.plot_flux(tally.flux)
+        plot.plot_flux(tally.fission_source)
 
 
 time1 = time.time()
