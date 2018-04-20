@@ -19,8 +19,6 @@ k_tally = tal.init_k_tally(kcode)
 # First loop loops over the number of total generations in the simulation
 for i in range(0, int(kcode[1])):
     # Second for loop loops over the number of particles per generation
-
-    k = 0
     test = 0
     test2 = 0
 
@@ -28,6 +26,7 @@ for i in range(0, int(kcode[1])):
         # Generates a new particle each time
         if i == 0:
             p = su.gen_particle(k_tally.k_tally[i], i, cell_array, geo)
+
         else:
             p = su.gen_particle(k_tally.k_tally[i], i, tally.fission_source, geo)
 
@@ -38,10 +37,11 @@ for i in range(0, int(kcode[1])):
             xc = su.get_XC(p.enrg, material, mat_array)
             tl_tot = tr.get_col_dist(xc.tot_xc)
             delta_x = tr.get_delta_x(p.dir, tl_tot)
+
             surf_cross = tr.det_surf_cross(delta_x, p, geo)
 
             # Particle does not undergo a collision, is simply reaches the
-            # edge of the surface, gets tallied, and is sent off in a new
+            # edge of the surface, gets tallied, and is sent off in a the same
             # direction. This also determines if the particle encounters
             # a problem boundary, in our case the particle is reflected.
             if surf_cross:
@@ -69,15 +69,16 @@ for i in range(0, int(kcode[1])):
                     p.enrg = 2
                     p.set_dir()
 
-        k += 1
+    print(test, test2)
     # Clear the previous generations flux/fission source to make room for the new flux
     # and fission source
     tally.clear_fission_source()
     tally.clear_flux()
 
     # Generate the flux and fission source for this generation
-    tally.gen_flux(k, geo)
+    tally.gen_flux(k_tally.num_par, geo)
     tally.gen_fission_source(geo, mat_array)
+    tally.gen_mesh_flux(k_tally.num_gen)
 
     # Now that we have generated our new flux/fission source, erase the tracklength tally
     tally.clear_track_length()
@@ -86,8 +87,9 @@ for i in range(0, int(kcode[1])):
         new_k = k_tally.get_k(k_tally.k_tally[i], geo, tally.fission_source)
         k_tally.accumulate_k(i+1, new_k)
 
-
-    if i > 48:
+    pp.plot_flux(tally.flux)
+    pp.plot_flux(tally.mesh_flux)
+    if i > 98:
         thermal_flux = pp.pin_cell_average_flux(tally.flux[:, 1])
         fast_flux = pp.pin_cell_average_flux(tally.flux[:, 0])
         pp.plot_flux(thermal_flux)
@@ -97,8 +99,12 @@ for i in range(0, int(kcode[1])):
         pp.plot_flux(tally.fission_source)
         pp.plot_flux(tally.mesh)
         pp.plot_flux(k_tally.k_tally)
+
     tally.clear_current()
     tally.clear_mesh()
+
+k_tally.get_k_final_unc()
+print("Final k value of ", k_tally.k_final, " with uncertainty ", k_tally.k_unc)
 
 time1 = time.time()
 print('1D MC took: ', time1-time0, 's to run.')

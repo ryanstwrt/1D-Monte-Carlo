@@ -28,6 +28,17 @@ class k_code_tally:
         new_k = k * new_k
         return new_k
 
+    def get_k_final_unc(self):
+        varience = self.k_tally[self.num_skip_gen:] ** 2
+        tracked_gen = (self.num_gen - self.num_skip_gen)
+        print(varience)
+        varience_scaler = np.sum(varience)
+        print(varience_scaler)
+        #self.k_unc = np.sqrt(varience_scaler) * (tracked_gen-1) * (tracked_gen)
+        self.k_final = sum(self.k_tally[self.num_skip_gen:]) / tracked_gen
+        self.k_unc = (1/((tracked_gen-1) * tracked_gen)) * np.sum((self.k_tally[self.num_skip_gen:] - self.k_final)**2)
+        print(self.k_unc)
+
 # Right now it just takes in a dummy cell
 class tally():
     def init_track_length(self, mesh):
@@ -45,6 +56,9 @@ class tally():
     def init_mesh(self):
         self.mesh = np.zeros((128, 2))
 
+    def init_mesh_flux(self):
+        self.mesh_flux = np.zeros((128, 2))
+
     def accumulate(self, p, prev_cell, tr_len):
         if p.enrg == 1:
             self.track_length[prev_cell][0] += p.wt * tr_len
@@ -56,6 +70,8 @@ class tally():
             for i, y in enumerate(self.track_length[x]):
                 self.flux[x, i] = y / (num_part * (geo.pos[x+1] - geo.pos[x]))
                 self.flux[x, i+2] = (y / (num_part * (geo.pos[x+1] - geo.pos[x]))) ** 2
+
+
 
 
     def gen_fission_source(self, geo, mat_array):
@@ -90,7 +106,15 @@ class tally():
         for i, x in enumerate(self.mesh):
             if mesh_pos < p.pos <= (mesh_pos + delta_x):
                 self.mesh[i][cur_enrg] += p.wt * tl
+                break
             mesh_pos += delta_x
+
+    def gen_mesh_flux(self, num_part):
+        for i, y in enumerate(self.mesh):
+            self.mesh_flux[i, 0] = y[0] / (num_part * 0.15625)
+            self.mesh_flux[i, 1] = y[1] / (num_part * 0.15625)
+
+
 
     def clear_fission_source(self):
         self.fission_source[:] = 0
@@ -122,6 +146,7 @@ def init_track_length_tally(geo):
     mt = tally()
     mt.init_track_length(len(geo.cells))
     mt.init_mesh()
+    mt.init_mesh_flux()
     mt.init_current(len(geo.cells))
     mt.init_flux(len(geo.cells))
     mt.init_fission_source(len(geo.cells))

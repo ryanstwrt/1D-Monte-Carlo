@@ -49,6 +49,6 @@
 
 Mesh: 128
 Particles_per_generation: 1000
-Number_generations: 50
+Number_generations: 100
 Skipped_generations: 25
 kguess: 1.0
