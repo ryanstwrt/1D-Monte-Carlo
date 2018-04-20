@@ -64,13 +64,14 @@ def get_tr_ln(delta_x, mu):
 
 # Returns 0 for absorption, 1 for inscatter, 2 for downscatter
 def get_col_type(XC, erng):
-    sigma_s = XC.downscat_xc + XC.inscat_xc
-    scatt_coll = ut.rand_col(sigma_s, XC.tot_xc)
-    if not scatt_coll:
+    sigma_f = XC.fiss_xc / XC.tot_xc
+    sigma_i = XC.inscat_xc / XC.tot_xc + sigma_f
+    sigma_d = XC.downscat_xc / XC.tot_xc + sigma_i
+    rand = random()
+    if rand < sigma_f:
         return 0
+    elif rand < sigma_i:
+        return 1
     else:
-        down_scat = ut.rand_col(XC.inscat_xc, sigma_s)
-        if not down_scat:
-            return 1
-        else:
-            return 2
+        return 2
+

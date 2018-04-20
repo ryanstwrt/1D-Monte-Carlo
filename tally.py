@@ -72,8 +72,6 @@ class tally():
                 self.flux[x, i+2] = (y / (num_part * (geo.pos[x+1] - geo.pos[x]))) ** 2
 
 
-
-
     def gen_fission_source(self, geo, mat_array):
         xc = set_up.get_XC(1, 0, mat_array)
         for i, y in enumerate(geo.mat):
