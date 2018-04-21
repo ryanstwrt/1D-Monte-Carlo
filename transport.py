@@ -20,7 +20,9 @@ def get_delta_x(mu, col_dist):
 # Determine if a the particle has crossed a surface
 def det_surf_cross(delta_x, p, geo):
     new_pos = p.pos + delta_x
-    if new_pos >= geo.pos[p.cell+1] or new_pos < geo.pos[p.cell]:
+    if new_pos > geo.pos[p.cell]:
+        return True
+    elif new_pos < geo.pos[p.cell-1]:
         return True
     else:
         return False
@@ -38,23 +40,36 @@ def move_part(p, delta_x):
 def move_part2surf(p, geo, delta_x):
     new_pos = p.pos + delta_x
     prev_cell = p.cell
-    if new_pos >= geo.pos[p.cell+1]:
-        if p.cell == geo.cells[-1]:
+    if p.cell == geo.cells[-1]:
+        if p.dir > 0:
             part_pos = geo.pos[-1]
             dist2surf = part_pos - p.pos
-        else:
-            part_pos = geo.pos[p.cell+1]
-            dist2surf = part_pos - p.pos
-            p.set_cell(part_pos, geo)
-    else:
-        if p.cell == geo.cells[0]:
-            part_pos = geo.pos[0]
-            dist2surf = p.pos - part_pos
+            p.cell = geo.cells[-1]
         else:
             part_pos = geo.pos[p.cell-1]
             dist2surf = p.pos - part_pos
-            p.set_cell(part_pos, geo)
-    return part_pos, dist2surf, prev_cell
+            p.cell = geo.cells[-2]
+    elif p.cell == geo.cells[0]:
+        if p.dir < 0:
+            part_pos = 0.0
+            dist2surf = p.pos - part_pos
+            p.cell = geo.cells[0]
+        else:
+            part_pos = geo.pos[p.cell+1]
+            dist2surf = part_pos - p.pos
+            p.cell = geo.cells[1]
+    else:
+        if p.dir < 0:
+            part_pos = geo.pos[p.cell-1]
+            dist2surf = p.pos - part_pos
+            p.cell = geo.cells[p.cell-1]
+        else:
+            part_pos = geo.pos[p.cell]
+            dist2surf = part_pos - p.pos
+            p.cell = geo.cells[p.cell+1]
+    p.pos = part_pos
+
+    return dist2surf, prev_cell
 
 
 # Determine the tracklength if the particle encountered a surface

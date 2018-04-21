@@ -64,4 +64,5 @@ def get_cell(pos, geo):
         for i, x in enumerate(geo.cells):
             if geo.pos[i] <= pos < geo.pos[i+1]:
                 return geo.cells[i]
+                break
 

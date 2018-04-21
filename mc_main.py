@@ -6,7 +6,7 @@ import numpy as np
 import time
 
 
-print("Welcome to the 1D Monte Carlo Slab solver!\n")
+print("Welcome to the 1D Monte Carlo Slab solver!")
 print("Starting Simulation Now")
 time0 = time.time()
 data_file = "TestA.txt"
@@ -14,7 +14,19 @@ input_file = "Input_File.txt"
 
 mat_array = su.get_data(data_file)
 cell_array, mesh, kcode = su.input_reader(input_file)
+
+# recreated the geometry using these cells to give 128 cells
+cell_array_128 = np.linspace(0.0,20., num=128)
+material_cell = np.zeros(len(cell_array_128))
+material_cell = material_cell.reshape(16,8)
+material_cell[:,:] = 2
+material_cell[:8, 2:6] = 0
+material_cell[8:, 2:6] = 1
+material_cell = material_cell.ravel()
 geo = su.gen_geometry(mesh, cell_array)
+geo.cells = np.arange(0, 128)
+geo.pos = cell_array_128
+geo.mat = material_cell
 tally = tal.init_track_length_tally(geo)
 k_tally = tal.init_k_tally(kcode)
 # First loop loops over the number of total generations in the simulation
@@ -39,7 +51,6 @@ for i in range(0, int(kcode[1])):
             xc = su.get_XC(p.enrg, material, mat_array)
             tl_tot = tr.get_col_dist(xc.tot_xc)
             delta_x = tr.get_delta_x(p.dir, tl_tot)
-
             surf_cross = tr.det_surf_cross(delta_x, p, geo)
 
             # Particle does not undergo a collision, is simply reaches the
@@ -47,12 +58,12 @@ for i in range(0, int(kcode[1])):
             # direction. This also determines if the particle encounters
             # a problem boundary, in our case the particle is reflected.
             if surf_cross:
-                p.pos, dist2surf, prev_cell = tr.move_part2surf(p, geo, delta_x)
+                dist2surf, prev_cell = tr.move_part2surf(p, geo, delta_x)
                 tr_ln = tr.get_tr_ln(dist2surf, p.dir)
                 # Check Right hand boundary
                 if p.pos == geo.pos[0] or p.pos == geo.pos[-1]:
                     p.dir = -p.dir
-                tally.accumulate(p, prev_cell, tr_ln)
+                tally.accumulate(p, p.cell, tr_ln)
                 tally.accumulate_current(p, prev_cell)
                 tally.accumulate_mesh(p, tr_ln)
 
@@ -60,9 +71,8 @@ for i in range(0, int(kcode[1])):
             # then we sample to determine what type of collision occurs
             else:
                 p.pos = tr.move_part(p, delta_x)
-                tr_ln = tl_tot
-                tally.accumulate(p, p.cell, tr_ln)
-                tally.accumulate_mesh(p, tr_ln)
+                tally.accumulate(p, p.cell, tl_tot)
+                tally.accumulate_mesh(p, tl_tot)
                 col_type = tr.get_col_type(xc, p.enrg)
                 if col_type == 0:
                     p.alive = False
@@ -80,9 +90,8 @@ for i in range(0, int(kcode[1])):
     # Generate the flux and fission source for this generation
     tally.gen_flux(k_tally.num_par, geo)
     tally.gen_fission_source(geo, mat_array)
-    tally.gen_mesh_flux(k_tally.num_gen)
-    pp.plot_flux(tally.track_length, "Flux", "Cell #", "Flux (1/cm^2)", "Fast Flux", "Thermal Flux")
-    pp.plot_1d_array(tally.fission_source, "Fission Source", "Cell #", "Probability", "Fission Source")
+    # tally.gen_mesh_flux(k_tally.num_gen)
+
 
     # Now that we have generated our new flux/fission source, erase the tracklength tally
     tally.clear_track_length()
@@ -97,15 +106,19 @@ for i in range(0, int(kcode[1])):
     #pp.plot_flux(tally.mesh_flux)
     #pp.plot_flux(cell_check)
     if i > 98:
-        thermal_flux = pp.pin_cell_average_flux(tally.flux[:, 1])
-        fast_flux = pp.pin_cell_average_flux(tally.flux[:, 0])
-        pp.plot_flux(thermal_flux)
-        pp.plot_flux(fast_flux)
-        pp.plot_flux(tally.current[:, :2])
-        pp.plot_flux(tally.flux[:, :2])
-        pp.plot_flux(tally.fission_source)
-        pp.plot_flux(tally.mesh)
-        pp.plot_flux(k_tally.k_tally)
+        pp.plot_flux(tally.track_length, "Flux", "Cell #", "Flux (1/cm^2)", "Fast Flux", "Thermal Flux")
+        pp.plot_flux(tally.current, "Current", "Cell #", "Flux (1/cm^2)", "Fast Flux", "Thermal Flux")
+        pp.plot_1d_array(tally.fission_source, "Fission Source", "Cell #", "Probability", "Fission Source")
+        #thermal_flux = pp.pin_cell_average_flux(tally.flux[:, 1])
+        #fast_flux = pp.pin_cell_average_flux(tally.flux[:, 0])
+        #pp.plot_flux(thermal_flux)
+        #pp.plot_flux(fast_flux)
+        #pp.plot_flux(tally.current[:, :2])
+        #pp.plot_flux(tally.flux[:, :2])
+        #pp.plot_flux(tally.fission_source)
+        #pp.plot_flux(tally.mesh)
+        pp.plot_1d_array(k_tally.k_tally, "K Convergence", "Number of Histories", "Keff", "Keff")
+
 
 
 

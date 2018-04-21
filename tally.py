@@ -24,7 +24,8 @@ class k_code_tally:
     def get_k(self, k, geo, fission_source):
         new_k = 0
         for i, fs in enumerate(fission_source):
-            new_k += fs * (geo.pos[i+1]-geo.pos[i])
+            if i < 127:
+                new_k += fs * (geo.pos[i+1]-geo.pos[i])
         new_k = k * new_k
         return new_k
 
@@ -68,8 +69,9 @@ class tally():
     def gen_flux(self, num_part, geo):
         for x in geo.cells:
             for i, y in enumerate(self.track_length[x]):
-                self.flux[x, i] = y / (num_part * (geo.pos[x+1] - geo.pos[x]))
-                self.flux[x, i+2] = (y / (num_part * (geo.pos[x+1] - geo.pos[x]))) ** 2
+                if x < 127:
+                    self.flux[x, i] = y / (num_part * 0.15625)
+                    self.flux[x, i+2] = (y / (num_part * 0.15625)) ** 2
 
 
     def gen_fission_source(self, geo, mat_array):
@@ -88,10 +90,16 @@ class tally():
 
     def accumulate_current(self, p, prev_cell):
         cur_enrg = p.enrg -1
-        if p.cell > prev_cell:
+        if p.cell == 0:
+            if prev_cell == 0:
+                self.current[p.cell][cur_enrg] -= p.wt
+        elif p.cell == 127:
+            if prev_cell == 127:
+                self.current[p.cell][cur_enrg] += p.wt
+        elif p.cell > prev_cell:
             self.current[p.cell][cur_enrg] += p.wt
         else:
-            self.current[prev_cell][cur_enrg] -= p.wt
+            self.current[p.cell][cur_enrg] -= p.wt
         if p.cell > prev_cell:
             self.current[p.cell][cur_enrg+2] += p.wt ** 2
         else:
